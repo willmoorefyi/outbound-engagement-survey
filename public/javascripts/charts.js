@@ -37,21 +37,30 @@ $(function () {
                         borderWidth: 0
                     },
                     series: _.map(people, function(person) {
-                        return { 'name' : person.email, 
-                            'data': _.chain(results)
-                                .filter(function(result) {
-                                    return result.user_id == person.id;
-                                })
-                                .map(function(result) {
-                                    return _.round(_.mean([ 
-                                        result.fit,
-                                        result.proud,
-                                        result.excited,
-                                        result.meaningful
-                                    ]));
-                                })
-                                .value()
-                        };
+                        // TODO this is horrible, clean it up!
+                        var my_results = _.filter(results, function(result) {
+                            return result.user_id == person.id;
+                        });
+
+                        var data = _.map(iterations, function(iteration) {
+
+                            var my_result = _.find(my_results, function(my_result) {
+                                return my_result.iteration_id == iteration.id;
+                            });
+
+                            if (my_result) { 
+                                return _.round(_.mean([ 
+                                    my_result.fit,
+                                    my_result.proud,
+                                    my_result.excited,
+                                    my_result.meaningful
+                                ]));
+                            } else {
+                                return null;
+                            }
+                        });
+
+                        return { 'name' : person.email, 'data' : data };
                     })
                 });
 
