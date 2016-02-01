@@ -5,6 +5,9 @@ $(function () {
             $.get('/api/v1/results', function(results) {
 
                 $('#container').highcharts({
+                    chart: {
+                        type: 'spline'
+                    },
                     title: {
                         text: 'Average Engagement Over Time',
                         x: -20 //center
