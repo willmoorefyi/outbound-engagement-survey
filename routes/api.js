@@ -76,6 +76,8 @@ router.post('/results', function(req, res, next) {
     var meaningful = req.body.meaningful;
     var company = req.body.company;
 
+    console.log('Received request: ' + JSON.stringify(req.body));
+
     if(!email || !date || !fit || !proud || !excited || !meaningful || !company ) {
         res.status(400).send( { error: 'Did not provide all required values!'});
     }
