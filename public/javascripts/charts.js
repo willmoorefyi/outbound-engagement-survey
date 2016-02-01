@@ -52,7 +52,7 @@ $(function () {
                             });
 
                             if (my_result) { 
-                                return _.round(_.mean([ 
+                                return _.floor(_.mean([ 
                                     my_result.fit,
                                     my_result.proud,
                                     my_result.excited,
