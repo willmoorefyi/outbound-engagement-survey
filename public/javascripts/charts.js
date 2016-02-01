@@ -18,6 +18,9 @@ $(function () {
                         title: {
                             text: 'Avg. Engagement'
                         },
+                        min: 0,
+                        max: 7,
+                        tickAmount: 8,
                         plotLines: [{
                             value: 0,
                             width: 1,
@@ -34,7 +37,7 @@ $(function () {
                         borderWidth: 0
                     },
                     series: _.map(people, function(person) {
-                        return { 'name' : person.name, 
+                        return { 'name' : person.email, 
                             'data': _.chain(results)
                                 .filter(function(result) {
                                     return result.user_id == person.id;
