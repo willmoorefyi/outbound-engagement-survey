@@ -19,7 +19,7 @@ router.get('/person', function(req, res, next) {
     });
 });
 
-router.put('/person', function(req, res, next) {
+router.post('/person', function(req, res, next) {
     var email = req.body.email;
     var name = req.body.name;
 
@@ -42,7 +42,7 @@ router.get('/iteration', function(req, res, next) {
     });
 });
 
-router.put('/iteration', function(req, res, next) {
+router.post('/iteration', function(req, res, next) {
     var name = req.body.name;
     var startDate = req.body.startDate;
     var endDate = req.body.endDate;
