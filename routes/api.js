@@ -14,7 +14,6 @@ router.get('/', function(req, res, next) {
 
 router.get('/person', function(req, res, next) {
     runSql("SELECT * FROM person", null, function(err, results) {
-        console.log('Got results: ' + results);
         res.status(200).send(results.rows);
     });
 });
@@ -62,7 +61,6 @@ router.post('/iteration', function(req, res, next) {
 
 router.get('/results', function(req, res, next) {
     runSql("SELECT * FROM results", null, function(err, results) {
-        console.log('Got results: ' + results);
         res.status(200).send(results.rows);
     });
 });
