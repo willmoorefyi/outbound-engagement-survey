@@ -60,6 +60,50 @@ router.post('/iteration', function(req, res, next) {
     });
 });
 
+router.get('/results', function(req, res, next) {
+    runSql("SELECT * FROM results", null, function(err, results) {
+        console.log('Got results: ' + results);
+        res.status(200).send(results.rows);
+    });
+});
+
+router.post('/results', function(req, res, next) {
+    var email = req.body.email;
+    var date = req.body.date;
+    var fit = req.body.fit;
+    var proud = req.body.proud;
+    var excited = req.body.excited;
+    var meaningful = req.body.meaningful;
+    var company = req.body.company;
+
+    if(!email || !date || !fit || !proud || !excited || !meaningful || !company ) {
+        res.status(400).send( { error: 'Did not provide all required values!'});
+    }
+
+    runSql("SELECT id FROM person WHERE email = $1", [ email ], function(err, results) {
+        console.log("Found results: " + results.rows.length);
+        if (err || results.rows.length != 1) {
+            res.status(500).send({ error: 'No matching user ID found for email "' + email + '"'});
+        } else {
+            var user_id = results.rows[0].id;
+            runSql("SELECT id FROM iteration where date_retro_start < $1 AND date_retro_end >= $2", 
+                [ date, date ], function(err,results) {
+                if (err || results.rows.length != 1) {
+                    res.status(500).send({ error: 'No single matching iteration ID found for date "' + date + '"'});
+                } else {
+                    var iteration_id = results.rows[0].id;
+                    runSql("INSERT INTO results (user_id, iteration_id, fit, proud, excited, meaningful, company) " + 
+                        "VALUES($1, $2, $3, $4, $5, $6, $7);",  
+                        [user_id, iteration_id, fit, proud, excited, meaningful, company], 
+                        function(err, results) {
+                        res.status(200).send({ 'Status' : 'OK' });
+                    });
+                }
+            });
+        }
+    });
+});
+
 // TODO add error callback
 function runSql(sql, params, callback, scope) {
     pg.connect(process.env.DATABASE_URL, function(err, client, done) {
