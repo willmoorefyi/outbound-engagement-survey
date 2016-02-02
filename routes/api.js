@@ -111,7 +111,6 @@ function runSql(sql, params, callback, scope) {
             console.error('Could not connect to database');
             response.send({ error: 'could not connect to Database' });
         } else {
-            console.log('Connected to DB');
             client.query(sql, params, function(err, results) {
                 done();
                 if (err) {
