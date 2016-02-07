@@ -41,6 +41,12 @@ $(function () {
                 borderWidth: 0
             },
             series: _.map(people, function(person) {
+
+                var name = _.chain(person.email.split('@')[0].split('\.'))
+                    .map(_.capitalize)
+                    .join(' ')
+                    .value()
+
                 // TODO this is horrible, clean it up!
                 var my_results = _.filter(results, function(result) {
                     return result.user_id == person.id;
@@ -64,7 +70,7 @@ $(function () {
                     }
                 });
 
-                return { 'name' : person.email, 'data' : data };
+                return { 'name' : name, 'data' : data };
             })
         });
 
