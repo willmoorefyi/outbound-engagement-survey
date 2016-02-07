@@ -96,7 +96,11 @@ router.post('/results', function(req, res, next) {
                         "VALUES($1, $2, $3, $4, $5, $6, $7);",  
                         [user_id, iteration_id, fit, proud, excited, meaningful, company], 
                         function(err, results) {
-                        res.status(200).send({ 'Status' : 'OK' });
+                        if(err) {
+                            res.status(500).send({ error: 'Could not insert into results table: ' + err });
+                        } else {
+                            res.status(200).send({ 'Status' : 'OK' });
+                        }
                     });
                 }
             });
@@ -109,16 +113,16 @@ function runSql(sql, params, callback, scope) {
     pg.connect(process.env.DATABASE_URL, function(err, client, done) {
         if (!client) {
             console.error('Could not connect to database');
-            response.send({ error: 'could not connect to Database' });
+            callback.call(scope, { error: 'Could not connect to database'});
+        } else if (err) {
+            calbback.call(scope, err);
         } else {
             client.query(sql, params, function(err, results) {
                 done();
                 if (err) {
-                    console.error('Error: ' + err);
-                    response.status(500).send({ error: err });
-                } else {
-                    callback.call(scope, err, results);
+                    console.error('Error executing query: "' + sql + '", ' + params + '"', err);
                 }
+                callback.call(scope, err, results);
             });
         }
     });
