@@ -1,7 +1,7 @@
 var express = require('express');
-var router = express.Router();
+var runSql = require('../db/runSql');
 
-var pg = require('pg');
+var router = express.Router();
 
 /* GET */
 router.get('/', function(req, res, next) {
@@ -107,26 +107,6 @@ router.post('/results', function(req, res, next) {
         }
     });
 });
-
-// TODO add error callback
-function runSql(sql, params, callback, scope) {
-    pg.connect(process.env.DATABASE_URL, function(err, client, done) {
-        if (!client) {
-            console.error('Could not connect to database');
-            callback.call(scope, { error: 'Could not connect to database'});
-        } else if (err) {
-            calbback.call(scope, err);
-        } else {
-            client.query(sql, params, function(err, results) {
-                done();
-                if (err) {
-                    console.error('Error executing query: "' + sql + '", ' + params + '"', err);
-                }
-                callback.call(scope, err, results);
-            });
-        }
-    });
-}
 
 function BadRequest(msg){
   this.name = 'Bad Request';
