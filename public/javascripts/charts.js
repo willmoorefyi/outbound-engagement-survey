@@ -64,7 +64,7 @@ $(function () {
                             my_result.proud,
                             my_result.excited,
                             my_result.meaningful
-                        ]));
+                        ]), 2);
                     } else {
                         return null;
                     }
