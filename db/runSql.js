@@ -1,5 +1,4 @@
 var pg = require('pg');
-var _ = require('lodash');
 
 module.exports = function(sql, params, callback, scope) {
     pg.connect(process.env.DATABASE_URL, function(err, client, done) {
