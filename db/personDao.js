@@ -3,8 +3,7 @@ var cn = process.env.DATABASE_URL;
 
 var personDao = {};
 
-
-personDao.getAllPeople = function() {
+personDao.getAll = function() {
     var db = pgp(cn);
     return db.any('SELECT * FROM person');
 }

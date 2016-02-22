@@ -2,6 +2,7 @@ var express = require('express');
 var _ = require('lodash');
 var runSql = require('../db/runSql');
 var personDao = require('../db/personDao');
+var iterationDao = require('../db/iterationDao');
 
 var router = express.Router();
 
@@ -15,7 +16,7 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/person', function(req, res, next) {
-    personDao.getAllPeople().then(function(results) {
+    personDao.getAll().then(function(results) {
         console.log(results);
         res.status(200).send(results);
     }).catch(_.curry(handleError)(res, 'Unable to fetch people from DB'));
@@ -33,10 +34,9 @@ router.post('/person', function(req, res, next) {
 });
 
 router.get('/iteration', function(req, res, next) {
-    runSql("SELECT * FROM iteration", null, function(err, results) {
-        console.log('Got results: ' + results);
-        res.status(200).send(results.rows);
-    });
+    iterationDao.getAll().then(function(results) {
+        res.status(200).send(results);
+    }).catch(_.curry(handleError)(res, 'Unable to fetch iterations from DB'));
 });
 
 router.post('/iteration', function(req, res, next) {
@@ -44,17 +44,11 @@ router.post('/iteration', function(req, res, next) {
     var startDate = req.body.startDate;
     var endDate = req.body.endDate;
 
-    console.log('Connecting to DB: "' + process.env.DATABASE_URL + '" to add iteration: "' + 
-        name + '" with start "' + startDate + '" and end "' + endDate + '"');
+    console.log('Adding iteration: "' + name + '" with start "' + startDate + '" and end "' + endDate + '"');
 
-    if(!name || !startDate || !endDate) {
-        res.status(400).send( { error: 'Did not provide "name", "startDate", and "endDate"'});
-    }
-
-    runSql("INSERT INTO iteration (name, date_retro_start, date_retro_end) VALUES($1, $2, $3);", 
-        [ name, new Date(startDate), new Date(endDate) ], function(err, results) {
+    iterationDao.createIteration(name, startDate, endDate).then(function() {
         res.status(200).send({ 'Status' : 'OK' });
-    });
+    }).catch(_.curry(handleError)(res, 'Unable to insert iteration into DB'));
 });
 
 router.get('/results', function(req, res, next) {
