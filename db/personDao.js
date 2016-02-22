@@ -1,15 +1,15 @@
 var pgp = require('pg-promise')();
 var cn = process.env.DATABASE_URL;
 
-var userDao = {};
+var personDao = {};
 
 
-userDao.getAllPeople = function() {
+personDao.getAllPeople = function() {
     var db = pgp(cn);
-    return db.any('SELECT * FROM persons');
+    return db.any('SELECT * FROM person');
 }
 
-userDao.createPerson = function(email, name) {
+personDao.createPerson = function(email, name) {
     var db = pgp(cn);
     if(!email || !name) {
         return Promise.reject("Did not provide 'email' and 'name'");
@@ -18,4 +18,4 @@ userDao.createPerson = function(email, name) {
     };
 }
 
-module.exports = userDao;
+module.exports = personDao;

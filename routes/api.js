@@ -1,7 +1,7 @@
 var express = require('express');
 var _ = require('lodash');
 var runSql = require('../db/runSql');
-var userDao = require('../db/userDao');
+var personDao = require('../db/personDao');
 
 var router = express.Router();
 
@@ -15,7 +15,8 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/person', function(req, res, next) {
-    userDao.getAllPeople().then(function(results) {
+    personDao.getAllPeople().then(function(results) {
+        console.log(results);
         res.status(200).send(results);
     }).catch(_.curry(handleError)(res, 'Unable to fetch people from DB'));
 });
@@ -26,7 +27,7 @@ router.post('/person', function(req, res, next) {
 
     console.log('Adding user: "' + email + '" with name "' + name + '"');
 
-    userDao.createPerson(email, name).then(function() {
+    personDao.createPerson(email, name).then(function() {
         res.status(200).send({ 'Status' : 'OK' });
     }).catch(_.curry(handleError)(res, 'Unable to insert person into DB'));
 });
