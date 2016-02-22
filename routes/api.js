@@ -1,5 +1,7 @@
 var express = require('express');
+var _ = require('lodash');
 var runSql = require('../db/runSql');
+var userDao = require('../db/userDao');
 
 var router = express.Router();
 
@@ -13,25 +15,20 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/person', function(req, res, next) {
-    runSql("SELECT * FROM person", null, function(err, results) {
-        res.status(200).send(results.rows);
-    });
+    userDao.getAllPeople().then(function(results) {
+        res.status(200).send(results);
+    }).catch(_.curry(handleError)(res, 'Unable to fetch people from DB'));
 });
 
 router.post('/person', function(req, res, next) {
     var email = req.body.email;
     var name = req.body.name;
 
-    console.log('Connecting to DB: "' + process.env.DATABASE_URL + '" to add user: "' + 
-        email + '" with name "' + name + '"');
+    console.log('Adding user: "' + email + '" with name "' + name + '"');
 
-    if(!email || !name) {
-        res.status(400).send( { error: 'Did not provide "email" and "name"'});
-    }
-
-    runSql("INSERT INTO person (email, name) VALUES($1, $2);", [ email, name ], function(err, results) {
+    userDao.createPerson(email, name).then(function() {
         res.status(200).send({ 'Status' : 'OK' });
-    }, this);
+    }).catch(_.curry(handleError)(res, 'Unable to insert person into DB'));
 });
 
 router.get('/iteration', function(req, res, next) {
@@ -112,6 +109,10 @@ function BadRequest(msg){
   this.name = 'Bad Request';
   Error.call(this, msg);
   Error.captureStackTrace(this, arguments.callee);
-} 
+}
+
+function handleError(response, description, error) {
+    response.status(500).send({ 'error' : description, 'errorDetails' : error});
+}
 
 module.exports = router;
