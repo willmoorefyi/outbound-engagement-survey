@@ -28,7 +28,7 @@ $(function () {
         });
 
         // use 10 most recent iterations with actual data
-        iterations = _.takeRight(_.uniq(iterations).sort(), 10);
+        iterations = _.takeRight(_.uniq(iterations).sort(function(a,b) { return a-b; }), 10);
 
         var categories = _(all_iterations).filter(function(iteration) {
             return iterations.indexOf(iteration.id) >= 0;
