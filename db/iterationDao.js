@@ -8,6 +8,12 @@ iterationDao.getAll = function() {
     return db.any('SELECT * FROM iteration');
 }
 
+iterationDao.fetchByDate = function(dateStart, dateEnd) {
+    var db = pgp(cn);
+    return db.any("SELECT * FROM iteration where date_retro_start < $1 AND date_retro_end >= $2",
+                [ dateStart, dateEnd ]);
+}
+
 iterationDao.createIteration = function(name, startDate, endDate) {
     var db = pgp(cn);
     if(!name || !startDate || !endDate) {

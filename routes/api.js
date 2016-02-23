@@ -1,18 +1,14 @@
 var express = require('express');
 var _ = require('lodash');
-var runSql = require('../db/runSql');
 var personDao = require('../db/personDao');
 var iterationDao = require('../db/iterationDao');
+var resultDao = require('../db/resultDao');
 
 var router = express.Router();
 
 /* GET */
 router.get('/', function(req, res, next) {
-    console.log('Reading Database URL: ' + process.env.DATABASE_URL);
-
-    runSql('SELECT * FROM results;', null, function(err, results) {
-        res.render('index', { title: 'API' });
-    });
+    res.render('index', { title: 'API' });
 });
 
 router.get('/person', function(req, res, next) {
@@ -52,9 +48,9 @@ router.post('/iteration', function(req, res, next) {
 });
 
 router.get('/results', function(req, res, next) {
-    runSql("SELECT * FROM results", null, function(err, results) {
-        res.status(200).send(results.rows);
-    });
+    resultDao.getAll().then(function(results) {
+        res.status(200).send(results);
+    }).catch(_.curry(handleError)(res, 'Unable to fetch results from DB'));
 });
 
 router.post('/results', function(req, res, next) {
@@ -72,32 +68,20 @@ router.post('/results', function(req, res, next) {
         res.status(400).send( { error: 'Did not provide all required values!'});
     }
 
-    runSql("SELECT id FROM person WHERE email = $1", [ email ], function(err, results) {
-        console.log("Found results: " + results.rows.length);
-        if (err || results.rows.length != 1) {
-            res.status(500).send({ error: 'No matching user ID found for email "' + email + '"'});
-        } else {
-            var user_id = results.rows[0].id;
-            runSql("SELECT id FROM iteration where date_retro_start < $1 AND date_retro_end >= $2", 
-                [ date, date ], function(err,results) {
-                if (err || results.rows.length != 1) {
-                    res.status(500).send({ error: 'No single matching iteration ID found for date "' + date + '"'});
-                } else {
-                    var iteration_id = results.rows[0].id;
-                    runSql("INSERT INTO results (user_id, iteration_id, fit, proud, excited, meaningful, company) " + 
-                        "VALUES($1, $2, $3, $4, $5, $6, $7);",  
-                        [user_id, iteration_id, fit, proud, excited, meaningful, company], 
-                        function(err, results) {
-                        if(err) {
-                            res.status(500).send({ error: 'Could not insert into results table: ' + err });
-                        } else {
-                            res.status(200).send({ 'Status' : 'OK' });
-                        }
-                    });
-                }
+    Promise.all([personDao.fetchByEmail(email), iterationDao.fetchByDate(date, date)])
+        .then(function(values) {
+            person = values[0];
+            iteration = values[1];
+            console.log('Received person: ' + JSON.stringify(person));
+            console.log('Received iteration: ' + JSON.stringify(iteration));
+            var user_id = person.id;
+            var iteration_id = iteration[0].id;
+
+            return resultDao.createResult(user_id, iteration_id, fit, proud, excited, meaningful, company).then(function() {
+                res.status(200).send({ 'Status' : 'OK' });
             });
-        }
-    });
+        })
+        .catch(_.curry(handleError)(res, 'Unable to insert results into DB'));
 });
 
 function BadRequest(msg){

@@ -8,6 +8,11 @@ personDao.getAll = function() {
     return db.any('SELECT * FROM person');
 }
 
+personDao.fetchByEmail = function(email) {
+    var db = pgp(cn);
+    return db.one("SELECT * FROM person WHERE email = $1", [ email ]);
+}
+
 personDao.createPerson = function(email, name) {
     var db = pgp(cn);
     if(!email || !name) {
