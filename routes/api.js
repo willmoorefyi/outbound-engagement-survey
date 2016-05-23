@@ -1,5 +1,6 @@
 var express = require('express');
 var _ = require('lodash');
+var teamDao = require('../db/teamDao');
 var personDao = require('../db/personDao');
 var iterationDao = require('../db/iterationDao');
 var resultDao = require('../db/resultDao');
@@ -9,6 +10,13 @@ var router = express.Router();
 /* GET */
 router.get('/', function(req, res, next) {
     res.render('index', { title: 'API' });
+});
+
+router.get('/team', function(req, res, next) {
+    teamDao.getAll().then(function(results) {
+        console.log(results);
+        res.status(200).send(results);
+    }).catch(_.curry(handleError)(res, 'Unable to fetch people from DB'));
 });
 
 router.get('/person', function(req, res, next) {

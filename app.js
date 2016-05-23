@@ -8,6 +8,7 @@ var hbs = require('hbs');
 
 var index = require('./routes/index');
 var people = require('./routes/people');
+var teams = require('./routes/teams');
 // TODO yeesh
 var api = require ('./routes/api');
 
@@ -31,6 +32,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
 app.use('/people', people);
+app.use('/teams', teams);
 app.use('/api/v1', api);
 
 // catch 404 and forward to error handler
