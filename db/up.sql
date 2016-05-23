@@ -1,7 +1,13 @@
+CREATE TABLE team (
+id serial PRIMARY KEY,
+name VARCHAR(50) NOT NULL
+);
+
 CREATE TABLE person (
 id serial PRIMARY KEY,
 email VARCHAR(255) DEFAULT NULL,
-name VARCHAR(50) DEFAULT NULL
+name VARCHAR(50) DEFAULT NULL,
+team_id integer REFERENCES team (id)
 );
 
 CREATE TABLE iteration (
