@@ -19,6 +19,29 @@ router.get('/team', function(req, res, next) {
     }).catch(_.curry(handleError)(res, 'Unable to fetch people from DB'));
 });
 
+router.post('/team', function(req, res, next) {
+    var name = req.body.name;
+
+    console.log('Adding team: "' + name + '"');
+
+    teamDao.createTeam(name).then(function() {
+        res.status(200).send({ 'Status' : 'OK' });
+    }).catch(_.curry(handleError)(res, 'Unable to insert team into DB'));
+});
+
+router.post('/team/:id', function(req, res, next) {
+    var teamId = req.params.id;
+    var name = req.body.name;
+
+    console.log('Editing team: "' + name + '"');
+
+/*
+    teamDao.createTeam(name).then(function() {
+        res.status(200).send({ 'Status' : 'OK' });
+    }).catch(_.curry(handleError)(res, 'Unable to insert team into DB'));
+*/
+});
+
 router.get('/person', function(req, res, next) {
     personDao.getAll().then(function(results) {
         console.log(results);
@@ -29,10 +52,11 @@ router.get('/person', function(req, res, next) {
 router.post('/person', function(req, res, next) {
     var email = req.body.email;
     var name = req.body.name;
+    var team = req.body.team;
 
-    console.log('Adding user: "' + email + '" with name "' + name + '"');
+    console.log('Adding user: "' + email + '" with name "' + name + '" and team "' + team + '"');
 
-    personDao.createPerson(email, name).then(function() {
+    personDao.createPerson(email, name, team).then(function() {
         res.status(200).send({ 'Status' : 'OK' });
     }).catch(_.curry(handleError)(res, 'Unable to insert person into DB'));
 });

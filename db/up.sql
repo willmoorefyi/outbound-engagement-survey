@@ -7,7 +7,8 @@ CREATE TABLE person (
 id serial PRIMARY KEY,
 email VARCHAR(255) DEFAULT NULL,
 name VARCHAR(50) DEFAULT NULL,
-team_id integer REFERENCES team (id)
+team_id integer REFERENCES team (id),
+CONSTRAINT uniq_person UNIQUE(email, name, team_id)
 );
 
 CREATE TABLE iteration (
